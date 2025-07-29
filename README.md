@@ -10,6 +10,8 @@ A simple, fluent JavaScript class for integrating Google Sign-In functionality i
 - 📱 **Auto-Prompt Support** - Optional automatic sign-in prompts
 - 🎯 **Zero Dependencies** - Works with vanilla JavaScript
 - 🔄 **Dynamic Loading** - Automatically loads Google Sign-In scripts
+- 🔀 **Multiple Instances** - Support for multiple Google Sign-In buttons on the same page
+- 🧹 **Memory Management** - Built-in cleanup methods for proper instance management
 
 ## Quick Start 🏃‍♂️
 
@@ -58,6 +60,14 @@ That's it! The Google Sign-In button will automatically appear in your container
 |--------|-------------|---------|---------|
 | `AutoPrompt(boolean)` | Enable automatic sign-in prompt | `false` | `.AutoPrompt(true)` |
 | `ButtonConfig(object)` | Customize button appearance | See below | `.ButtonConfig({theme: 'filled'})` |
+
+### Additional Methods
+
+| Method | Description | Example |
+|--------|-------------|---------|
+| `signIn()` | Programmatically trigger sign-in prompt | `manager.signIn()` |
+| `signOut()` | Disable auto-select for the user | `manager.signOut()` |
+| `destroy()` | Clean up instance and remove callbacks | `manager.destroy()` |
 
 ### Button Configuration Options
 
@@ -233,6 +243,236 @@ new GoogleSignInManager()
     theme: 'filled_blue'
   });
 ```
+
+## Multiple Instances Support 🔀
+
+The Google Sign-In Manager now supports multiple instances on the same page! Each instance is completely independent and can have different configurations, callbacks, and URLs.
+
+### Key Features
+
+- **Unique Instance IDs**: Each instance generates a unique identifier to avoid conflicts
+- **Independent Callbacks**: Each button has its own callback function in the global scope
+- **Separate Configurations**: Different button styles, sizes, and behaviors per instance
+- **Automatic Cleanup**: Built-in memory management with the `destroy()` method
+
+### Example: Multiple Buttons with Different Purposes
+
+```javascript
+// Login button for existing users
+const loginButton = new GoogleSignInManager()
+  .ElementID('login-signin')
+  .ClientID('your-client-id')
+  .CheckTokenURL('/api/login')
+  .FailURL('/login-error')
+  .SuccessURL('/dashboard')
+  .ButtonConfig({
+    theme: 'filled_blue',
+    text: 'signin_with',
+    size: 'large'
+  });
+
+// Registration button for new users
+const registerButton = new GoogleSignInManager()
+  .ElementID('register-signin')
+  .ClientID('your-client-id')
+  .CheckTokenURL('/api/register')
+  .FailURL('/register-error')
+  .SuccessURL('/onboarding')
+  .ButtonConfig({
+    theme: 'outline',
+    text: 'signup_with',
+    size: 'medium'
+  });
+
+// Quick access button in header
+const headerButton = new GoogleSignInManager()
+  .ElementID('header-signin')
+  .ClientID('your-client-id')
+  .CheckTokenURL('/api/quick-login')
+  .FailURL('/login')
+  .SuccessURL('/dashboard')
+  .ButtonConfig({
+    type: 'icon',
+    size: 'small'
+  });
+```
+
+### Advanced Multi-Instance Usage
+
+```javascript
+// E-commerce site example
+const checkoutButton = new GoogleSignInManager()
+  .ElementID('checkout-signin')
+  .ClientID('your-client-id')
+  .CheckTokenURL('/api/checkout-auth')
+  .FailURL('/cart', (data) => {
+    showMessage('Please sign in to continue checkout');
+  })
+  .SuccessURL('/checkout/shipping', (data) => {
+    // Pre-fill user data for faster checkout
+    populateCheckoutForm(data.user);
+  })
+  .ButtonConfig({
+    text: 'continue_with',
+    theme: 'filled_blue'
+  });
+
+const newsletterButton = new GoogleSignInManager()
+  .ElementID('newsletter-signin')
+  .ClientID('your-client-id')
+  .CheckTokenURL('/api/newsletter-signup')
+  .FailURL('/newsletter', (data) => {
+    showMessage('Newsletter signup failed');
+  })
+  .SuccessURL('/newsletter/welcome', (data) => {
+    trackEvent('newsletter_signup', { method: 'google' });
+  })
+  .ButtonConfig({
+    text: 'signup_with',
+    size: 'medium'
+  });
+```
+
+### Instance Management
+
+#### Cleanup Instances
+
+When you need to remove a Google Sign-In button (e.g., user logs in, modal closes):
+
+```javascript
+const signInInstance = new GoogleSignInManager()
+  .ElementID('modal-signin')
+  .ClientID('your-client-id')
+  .CheckTokenURL('/api/verify')
+  .FailURL('/error')
+  .SuccessURL('/dashboard');
+
+// Later, when modal closes or component unmounts
+signInInstance.destroy();
+```
+
+#### Dynamic Instance Creation
+
+```javascript
+function createSignInButton(containerId, purpose) {
+  return new GoogleSignInManager()
+    .ElementID(containerId)
+    .ClientID('your-client-id')
+    .CheckTokenURL(`/api/${purpose}`)
+    .FailURL('/error')
+    .SuccessURL('/dashboard')
+    .ButtonConfig(getButtonConfig(purpose));
+}
+
+// Create multiple buttons dynamically
+const instances = [
+  createSignInButton('sidebar-signin', 'quick-login'),
+  createSignInButton('footer-signin', 'newsletter'),
+  createSignInButton('popup-signin', 'registration')
+];
+
+// Cleanup all instances when needed
+instances.forEach(instance => instance.destroy());
+```
+
+### HTML Structure for Multiple Instances
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Multi-Instance Example</title>
+  <script src="GoogleSignInManager.js"></script>
+</head>
+<body>
+  <!-- Header with small login button -->
+  <header>
+    <nav>
+      <div id="header-signin"></div>
+    </nav>
+  </header>
+
+  <!-- Main content with large sign-up button -->
+  <main>
+    <section class="hero">
+      <h1>Welcome to Our Platform</h1>
+      <div id="main-signin"></div>
+    </section>
+  </main>
+
+  <!-- Sidebar with quick access -->
+  <aside>
+    <div id="sidebar-signin"></div>
+  </aside>
+
+  <!-- Modal with checkout signin -->
+  <div id="checkout-modal" style="display: none;">
+    <div id="checkout-signin"></div>
+  </div>
+
+  <script>
+    // Initialize all instances
+    // Header button
+    new GoogleSignInManager()
+      .ElementID('header-signin')
+      .ClientID('your-client-id')
+      .CheckTokenURL('/api/quick-login')
+      .FailURL('/login')
+      .SuccessURL('/dashboard')
+      .ButtonConfig({ size: 'small', type: 'icon' });
+
+    // Main button  
+    new GoogleSignInManager()
+      .ElementID('main-signin')
+      .ClientID('your-client-id')
+      .CheckTokenURL('/api/register')
+      .FailURL('/signup-error')
+      .SuccessURL('/onboarding')
+      .ButtonConfig({ size: 'large', theme: 'filled_blue' });
+
+    // Sidebar button
+    new GoogleSignInManager()
+      .ElementID('sidebar-signin')
+      .ClientID('your-client-id')
+      .CheckTokenURL('/api/sidebar-login')
+      .FailURL('/login')
+      .SuccessURL('/dashboard')
+      .ButtonConfig({ size: 'medium' });
+
+    // Checkout button (created when modal opens)
+    let checkoutInstance = null;
+    
+    function openCheckoutModal() {
+      document.getElementById('checkout-modal').style.display = 'block';
+      
+      checkoutInstance = new GoogleSignInManager()
+        .ElementID('checkout-signin')
+        .ClientID('your-client-id')
+        .CheckTokenURL('/api/checkout-auth')
+        .FailURL('/cart')
+        .SuccessURL('/checkout/shipping');
+    }
+    
+    function closeCheckoutModal() {
+      document.getElementById('checkout-modal').style.display = 'none';
+      
+      if (checkoutInstance) {
+        checkoutInstance.destroy();
+        checkoutInstance = null;
+      }
+    }
+  </script>
+</body>
+</html>
+```
+
+### Best Practices for Multiple Instances
+
+1. **Use Meaningful Element IDs**: Choose descriptive IDs that reflect the button's purpose
+2. **Different Endpoints**: Consider using different backend endpoints for different purposes
+3. **Unique Callbacks**: Implement different success/failure logic for each button
+4. **Proper Cleanup**: Always call `destroy()` when removing buttons from the DOM
+5. **Performance**: Create instances only when needed, especially for modals or dynamic content
 
 ## Backend Integration 🔧
 
