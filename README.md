@@ -268,7 +268,7 @@ if ($_POST['token']) {
         */
 
         // Token is valid
-        $user_id  = $user['sub'];
+        $user_id  = $user['id'];
         $email    = $user['email'];
         $name     = $user['full_name'];
         
