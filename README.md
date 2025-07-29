@@ -196,34 +196,7 @@ if ($_POST['token']) {
 }
 ?>
 ```
-
-### Node.js Example
-
-```javascript
-// verify-token.js
-const {OAuth2Client} = require('google-auth-library');
-const client = new OAuth2Client('your-client-id');
-
-app.post('/verify-token', async (req, res) => {
-  try {
-    const {token} = req.body;
-    const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: 'your-client-id'
-    });
-    
-    const payload = ticket.getPayload();
-    const userId = payload['sub'];
-    const email = payload['email'];
-    
-    // Handle user authentication
-    
-    res.json({status: 'success'});
-  } catch (error) {
-    res.json({status: 'error', message: 'Invalid token'});
-  }
-});
-```
+ 
 
 ## Setup Guide 🛠️
 
