@@ -5,6 +5,8 @@ class GoogleSignInManager {
     this.tokenURL = null;
     this.failURL = null;
     this.successURL = null;
+    this.failCallback = null;
+    this.successCallback = null;
     this.autoPrompt = false;
     this.buttonConfig = {
       type: 'standard',
@@ -35,13 +37,15 @@ class GoogleSignInManager {
     return this;
   }
 
-  FailURL(url) {
+  FailURL(url, callback = null) {
     this.failURL = url;
+    this.failCallback = callback;
     return this;
   }
 
-  SuccessURL(url) {
+  SuccessURL(url, callback = null) {
     this.successURL = url;
+    this.successCallback = callback;
     return this;
   }
 
@@ -155,13 +159,22 @@ class GoogleSignInManager {
     .then(res => res.json())
     .then(data => {
       if (data.status === 'success') {
+        if (this.successCallback && typeof this.successCallback === 'function') {
+          this.successCallback(data);
+        }
         window.location.href = this.successURL;
       } else {
+        if (this.failCallback && typeof this.failCallback === 'function') {
+          this.failCallback(data);
+        }
         window.location.href = this.failURL;
       }
     })
     .catch(err => {
       console.error('GoogleSignInManager Error:', err);
+      if (this.failCallback && typeof this.failCallback === 'function') {
+        this.failCallback({ status: 'error', error: err });
+      }
       window.location.href = this.failURL;
     });
   }
