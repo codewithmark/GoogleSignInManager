@@ -1,21 +1,9 @@
 <?php
 
-/*
-Client ID = 86712340085-nb37qkvbqjg705lli342pe7hee78hpga.apps.googleusercontent.com
-
-Client secret = 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
-
-Youtube Video: https://www.youtube.com/watch?v=TjMhPr59qn4
-
-https://www.youtube.com/watch?v=tgO_ADSvY1I
-
-
-*/
 session_start();
 require_once 'GoogleLoginStandalone.php';
 require_once 'key.php';
 
-//$clientId = '86712340085-nb37qkvbqjg705lli342pe7hee78hpga.apps.googleusercontent.com';
 
 $google = new GoogleLoginStandalone($clientId);
 $input = json_decode(file_get_contents('php://input'), true);
