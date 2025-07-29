@@ -160,12 +160,26 @@ if ($_POST['token']) {
     $token = $_POST['token'];
     
     // Verify token with Google
-    // https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
-    
-    $client = new Google_Client(['client_id' => 'your-client-id']);
+    require_once 'GoogleLoginStandalone.php';
+    $client = new GoogleLoginStandalone($clientId);
     $payload = $client->verifyIdToken($token);
     
     if ($payload) {
+
+        /*       
+        // If the user is verified, store their information in database or session
+        $user = [
+            'id'                => $data['sub'] ?? null,
+            'email'             => $data['email'] ?? null,
+            'full_name'         => $data['name'] ?? '',
+            'first_name'        => $data['given_name'] ?? '',
+            'last_name'         => $data['family_name'] ?? '',
+            'email_verified'    => $data['email_verified'] ?? false,
+            'picture'           => $data['picture'] ?? '',
+            'verified'          => $data['email_verified'] ?? false, 
+        ];        
+        */
+
         // Token is valid
         $user_id = $payload['sub'];
         $email = $payload['email'];
