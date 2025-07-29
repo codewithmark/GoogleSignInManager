@@ -161,7 +161,7 @@ if ($_POST['token']) {
     
     // Verify token with Google
     require_once 'GoogleLoginStandalone.php';
-    $client = new GoogleLoginStandalone($clientId);
+    $client = new GoogleLoginStandalone("your-client-id");
     $payload = $client->verifyIdToken($token);
     
     if ($payload) {
