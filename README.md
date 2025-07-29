@@ -90,7 +90,7 @@ That's it! The Google Sign-In button will automatically appear in your container
   <script>
     new GoogleSignInManager()
       .ElementID('google-signin')
-      .ClientID('86712340085-nb37qkvbqjg705lli342pe7hee78hpga.apps.googleusercontent.com')
+      .ClientID('your-google-client-id')
       .CheckTokenURL('verify-token.php')
       .FailURL('login-error.html')
       .SuccessURL('dashboard.html');
@@ -299,12 +299,7 @@ console.log('Manager initialized:', manager);
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Support 💬
-
-- 📧 Email: support@yourproject.com
-- 🐛 Issues: [GitHub Issues](https://github.com/yourusername/google-signin-manager/issues)
-- 📖 Docs: [Full Documentation](https://yourdocs.com)
-
+ 
 ---
 
 Made with ❤️ for developers who want simple Google Sign-In integration.
