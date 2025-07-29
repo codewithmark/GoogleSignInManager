@@ -17,6 +17,8 @@ class GoogleSignInManager {
       logo_alignment: 'left'
     };
     this.initialized = false;
+    this.instanceId = 'gsi_' + Math.random().toString(36).substr(2, 9);
+    this.callbackName = 'handleCredentialResponse_' + this.instanceId;
   }
 
   // Configuration methods
@@ -77,6 +79,20 @@ class GoogleSignInManager {
   }
 
   loadGoogleScript() {
+    // Check if script is already loaded or loading
+    if (document.querySelector('script[src="https://accounts.google.com/gsi/client"]')) {
+      // Script already exists, wait for it to load
+      const checkGoogle = () => {
+        if (window.google) {
+          this.setupGoogleSignIn();
+        } else {
+          setTimeout(checkGoogle, 100);
+        }
+      };
+      checkGoogle();
+      return;
+    }
+
     const script = document.createElement('script');
     script.src = 'https://accounts.google.com/gsi/client';
     script.async = true;
@@ -99,9 +115,9 @@ class GoogleSignInManager {
 
     // Create the onload div
     const onloadDiv = document.createElement('div');
-    onloadDiv.id = 'g_id_onload';
+    onloadDiv.id = 'g_id_onload_' + this.instanceId;
     onloadDiv.setAttribute('data-client_id', this.clientId);
-    onloadDiv.setAttribute('data-callback', 'handleCredentialResponse');
+    onloadDiv.setAttribute('data-callback', this.callbackName);
     onloadDiv.setAttribute('data-auto_prompt', this.autoPrompt.toString());
 
     // Create the signin button div
@@ -115,8 +131,8 @@ class GoogleSignInManager {
     container.appendChild(onloadDiv);
     container.appendChild(signinDiv);
 
-    // Set up global callback function
-    window.handleCredentialResponse = (response) => {
+    // Set up instance-specific callback function
+    window[this.callbackName] = (response) => {
       this.handleCredentialResponse(response);
     };
 
@@ -124,7 +140,7 @@ class GoogleSignInManager {
     if (window.google && window.google.accounts) {
       window.google.accounts.id.initialize({
         client_id: this.clientId,
-        callback: window.handleCredentialResponse
+        callback: window[this.callbackName]
       });
       
       // Render the button
@@ -190,6 +206,22 @@ class GoogleSignInManager {
   signOut() {
     if (window.google && window.google.accounts) {
       window.google.accounts.id.disableAutoSelect();
+    }
+  }
+
+  // Method to cleanup instance
+  destroy() {
+    // Remove the callback function from global scope
+    if (window[this.callbackName]) {
+      delete window[this.callbackName];
+    }
+    
+    // Clear the container
+    if (this.elementId) {
+      const container = document.getElementById(this.elementId);
+      if (container) {
+        container.innerHTML = '';
+      }
     }
   }
 }
