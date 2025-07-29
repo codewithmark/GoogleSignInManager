@@ -249,9 +249,9 @@ if ($_POST['token']) {
     // Verify token with Google
     require_once 'GoogleLoginStandalone.php';
     $client = new GoogleLoginStandalone("your-client-id");
-    $payload = $client->verifyIdToken($token);
+    $user = $client->verifyIdToken($token);
     
-    if ($payload) {
+    if ($user) {
 
         /*       
         // If the user is verified, store their information in database or session
@@ -268,9 +268,9 @@ if ($_POST['token']) {
         */
 
         // Token is valid
-        $user_id = $payload['sub'];
-        $email = $payload['email'];
-        $name = $payload['name'];
+        $user_id  = $user['sub'];
+        $email    = $user['email'];
+        $name     = $user['full_name'];
         
         // Create user session, save to database, etc.
         
