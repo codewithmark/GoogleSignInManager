@@ -49,8 +49,8 @@ That's it! The Google Sign-In button will automatically appear in your container
 | `ElementID(id)` | Sets the container element ID | ✅ | `.ElementID('my-signin-btn')` |
 | `ClientID(id)` | Sets your Google OAuth Client ID | ✅ | `.ClientID('123-abc.apps.googleusercontent.com')` |
 | `CheckTokenURL(url)` | Backend endpoint for token verification | ✅ | `.CheckTokenURL('api/verify.php')` |
-| `FailURL(url)` | Redirect URL on authentication failure | ✅ | `.FailURL('error.html')` |
-| `SuccessURL(url)` | Redirect URL on successful authentication | ✅ | `.SuccessURL('dashboard.html')` |
+| `FailURL(url, callback)` | Redirect URL on authentication failure with optional callback | ✅ | `.FailURL('error.html', (data) => console.log(data))` |
+| `SuccessURL(url, callback)` | Redirect URL on successful authentication with optional callback | ✅ | `.SuccessURL('dashboard.html', (data) => console.log(data))` |
 
 ### Optional Configuration
 
@@ -70,6 +70,80 @@ That's it! The Google Sign-In button will automatically appear in your container
   shape: 'rectangular',   // 'rectangular', 'pill', 'circle', 'square'
   logo_alignment: 'left'  // 'left', 'center'
 })
+```
+
+## New Features 🆕
+
+### Optional Callbacks for Success and Failure
+
+The `SuccessURL()` and `FailURL()` methods now support optional callback functions that execute before the redirect occurs. This allows you to perform custom actions like analytics tracking, UI updates, or data processing.
+
+#### Callback Parameters
+
+- **Success Callback**: Receives the response data from your backend verification endpoint
+- **Failure Callback**: Receives either the error response from your backend or an error object for network failures
+
+#### Example Usage
+
+```javascript
+new GoogleSignInManager()
+  .ElementID('signin-container')
+  .ClientID('your-google-client-id')
+  .CheckTokenURL('backend/verify-token.php')
+  .FailURL('login-failed.html', (errorData) => {
+    // Custom error handling
+    console.error('Login failed:', errorData);
+    
+    // Track analytics
+    analytics.track('login_failed', {
+      error: errorData.message || 'Unknown error',
+      timestamp: new Date().toISOString()
+    });
+    
+    // Show user-friendly message
+    showNotification('Login failed. Please try again.', 'error');
+  })
+  .SuccessURL('dashboard.html', (successData) => {
+    // Custom success handling
+    console.log('Login successful:', successData);
+    
+    // Track analytics
+    analytics.track('login_success', {
+      user_id: successData.user_id,
+      timestamp: new Date().toISOString()
+    });
+    
+    // Update UI
+    showNotification('Welcome! Redirecting to dashboard...', 'success');
+    document.getElementById('loading-spinner').style.display = 'block';
+  });
+```
+
+#### Callback Data Structure
+
+**Success Callback Data** (from your backend):
+```javascript
+{
+  status: 'success',
+  user_id: '12345',
+  email: 'user@example.com',
+  // ... other user data from your backend
+}
+```
+
+**Failure Callback Data** (from your backend or network errors):
+```javascript
+{
+  status: 'error',
+  message: 'Invalid token',
+  // ... other error details
+}
+
+// For network errors:
+{
+  status: 'error',
+  error: ErrorObject
+}
 ```
 
 ## Complete Examples 💡
@@ -106,8 +180,14 @@ new GoogleSignInManager()
   .ElementID('custom-signin')
   .ClientID('your-client-id')
   .CheckTokenURL('/api/auth/google')
-  .FailURL('/auth/error')
-  .SuccessURL('/dashboard')
+  .FailURL('/auth/error', (data) => {
+    console.log('Authentication failed:', data);
+    // Custom error handling before redirect
+  })
+  .SuccessURL('/dashboard', (data) => {
+    console.log('Authentication successful:', data);
+    // Custom success handling before redirect
+  })
   .AutoPrompt(true)
   .ButtonConfig({
     type: 'standard',
@@ -116,6 +196,25 @@ new GoogleSignInManager()
     text: 'continue_with',
     shape: 'pill',
     logo_alignment: 'center'
+  });
+```
+
+### Using Callbacks for Custom Logic
+
+```javascript
+new GoogleSignInManager()
+  .ElementID('signin-btn')
+  .ClientID('your-client-id')
+  .CheckTokenURL('/api/verify')
+  .FailURL('/error', (data) => {
+        
+    // Show custom error message
+    document.getElementById('error-msg').textContent = 'Sign-in failed. Please try again.';
+  })
+  .SuccessURL('/dashboard', (data) => {
+    
+    // Update UI before redirect
+    document.getElementById('loading').style.display = 'block';
   });
 ```
 
