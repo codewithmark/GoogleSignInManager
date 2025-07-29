@@ -94,24 +94,12 @@ new GoogleSignInManager()
     // Custom error handling
     console.error('Login failed:', errorData);
     
-    // Track analytics
-    analytics.track('login_failed', {
-      error: errorData.message || 'Unknown error',
-      timestamp: new Date().toISOString()
-    });
-    
     // Show user-friendly message
     showNotification('Login failed. Please try again.', 'error');
   })
   .SuccessURL('dashboard.html', (successData) => {
     // Custom success handling
     console.log('Login successful:', successData);
-    
-    // Track analytics
-    analytics.track('login_success', {
-      user_id: successData.user_id,
-      timestamp: new Date().toISOString()
-    });
     
     // Update UI
     showNotification('Welcome! Redirecting to dashboard...', 'success');
