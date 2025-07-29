@@ -1,58 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Google Login Demo</title>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-   <script src="SignInWithGoogle.js"></script>
+  <title>Google Sign-In Manager Demo</title>
+  <script src="GoogleSignInManager.js"></script>
 </head>
 <body>
-  <h1>Login with Google</h1>
-  <div id="g_id_onload"
-       data-client_id="86712340085-nb37qkvbqjg705lli342pe7hee78hpga.apps.googleusercontent.com"
-       data-callback="handleCredentialResponse"
-       data-auto_prompt="false">
-  </div>
-  <div class="g_id_signin"
-       data-type="standard"
-       data-size="large"
-       data-theme="outline"
-       data-text="sign_in_with"
-       data-shape="rectangular"
-       data-logo_alignment="left">
-  </div>
+  <h1>Google Sign-In with Custom Manager</h1>
+  
+  <!-- Container where the Google Sign-In button will be rendered -->
+  <div id="google-signin-container"></div>
+  
   <script>
-    function handleCredentialResponse(response) {      
-
-      const idToken = response.credential;
-
-      new SignInWithGoogle()
-      .Token(idToken)
-      .TokenURL('google-login-handler.php')
-      .FailURL('fail.php')
-      .SuccessURL('dashboard.php');
-
-       
-
-      /*
-      fetch('google-login-handler.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: idToken })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === 'success') {
-          //window.location.href = 'dashboard.php';
-        } else {
-          alert("Login failed");
-        }
-      })
-      .catch(err => {
-        console.error("Error:", err);
-        alert("Something went wrong.");
-      });
-      */
-    }
+    // Initialize the Google Sign-In Manager with fluent interface
+    new GoogleSignInManager()
+    .ElementID('google-signin-container')
+    .ClientID('86712340085-nb37qkvbqjg705lli342pe7hee78hpga.apps.googleusercontent.com')
+    .CheckTokenURL('google-login-handler.php')
+    .FailURL('fail.php')
+    .SuccessURL('dashboard.php');
   </script>
 </body>
 </html>
