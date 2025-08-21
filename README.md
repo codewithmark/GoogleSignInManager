@@ -37,6 +37,7 @@ new GoogleSignInManager()
   .ClientID('your-google-client-id')
   .CheckTokenURL('backend/verify-token.php')
   .FailURL('login-failed.html')
+  .FailRedirect(false) // disables redirect on failure
   .SuccessURL('dashboard.html');
 ```
 
@@ -104,16 +105,14 @@ new GoogleSignInManager()
     // Custom error handling
     console.error('Login failed:', errorData);
     
-    // Show user-friendly message
-    showNotification('Login failed. Please try again.', 'error');
+    // Show user-friendly message 
   })
+  .FailRedirect(false) // disables redirect on failure
   .SuccessURL('dashboard.html', (successData) => {
     // Custom success handling
     console.log('Login successful:', successData);
     
-    // Update UI
-    showNotification('Welcome! Redirecting to dashboard...', 'success');
-    document.getElementById('loading-spinner').style.display = 'block';
+    // Update UI 
   });
 ```
 
@@ -164,7 +163,7 @@ new GoogleSignInManager()
       .ElementID('google-signin')
       .ClientID('your-google-client-id')
       .CheckTokenURL('verify-token.php')
-      .FailURL('login-error.html')
+      .FailURL('login-error.html')      
       .SuccessURL('dashboard.html');
   </script>
 </body>
@@ -182,6 +181,7 @@ new GoogleSignInManager()
     console.log('Authentication failed:', data);
     // Custom error handling before redirect
   })
+  .FailRedirect(false) // disables redirect on failure
   .SuccessURL('/dashboard', (data) => {
     console.log('Authentication successful:', data);
     // Custom success handling before redirect
@@ -209,6 +209,7 @@ new GoogleSignInManager()
     // Show custom error message
     document.getElementById('error-msg').textContent = 'Sign-in failed. Please try again.';
   })
+  .FailRedirect(false) // disables redirect on failure
   .SuccessURL('/dashboard', (data) => {
     
     // Update UI before redirect
@@ -308,6 +309,7 @@ const checkoutButton = new GoogleSignInManager()
   .FailURL('/cart', (data) => {
     showMessage('Please sign in to continue checkout');
   })
+  .FailRedirect(false) // disables redirect on failure
   .SuccessURL('/checkout/shipping', (data) => {
     // Pre-fill user data for faster checkout
     populateCheckoutForm(data.user);
