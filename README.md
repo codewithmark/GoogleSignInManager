@@ -106,8 +106,7 @@ new GoogleSignInManager()
     console.error('Login failed:', errorData);
     
     // Show user-friendly message 
-  })
-  .FailRedirect(false) // disables redirect on failure
+  })  
   .SuccessURL('dashboard.html', (successData) => {
     // Custom success handling
     console.log('Login successful:', successData);
@@ -181,7 +180,6 @@ new GoogleSignInManager()
     console.log('Authentication failed:', data);
     // Custom error handling before redirect
   })
-  .FailRedirect(false) // disables redirect on failure
   .SuccessURL('/dashboard', (data) => {
     console.log('Authentication successful:', data);
     // Custom success handling before redirect
@@ -208,8 +206,7 @@ new GoogleSignInManager()
         
     // Show custom error message
     document.getElementById('error-msg').textContent = 'Sign-in failed. Please try again.';
-  })
-  .FailRedirect(false) // disables redirect on failure
+  })  
   .SuccessURL('/dashboard', (data) => {
     
     // Update UI before redirect
