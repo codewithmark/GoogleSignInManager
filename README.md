@@ -36,8 +36,7 @@ new GoogleSignInManager()
   .ElementID('signin-container')
   .ClientID('your-google-client-id')
   .CheckTokenURL('backend/verify-token.php')
-  .FailURL('login-failed.html')
-  .FailRedirect(false) // disables redirect on failure
+  .FailURL('login-failed.html') 
   .SuccessURL('dashboard.html');
 ```
 
