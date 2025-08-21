@@ -181,25 +181,32 @@ class GoogleSignInManager {
     .then(res => res.json())
     .then(data => {
       if (data.status === 'success') {
-        if (this.successCallback && typeof this.successCallback === 'function') {
+        const hasSuccessCallback = this.successCallback && typeof this.successCallback === 'function';
+        if (hasSuccessCallback) {
           this.successCallback(data);
         }
-        window.location.href = this.successURL;
+        // Only redirect if no callback is provided
+        if (!hasSuccessCallback && this.successURL) {
+          window.location.href = this.successURL;
+        }
       } else {
-        if (this.failCallback && typeof this.failCallback === 'function') {
+        const hasCallback = this.failCallback && typeof this.failCallback === 'function';
+        if (hasCallback) {
           this.failCallback(data);
         }
-        if (this.failRedirect && this.failURL) {
+        // Only redirect if no callback is provided
+        if (!hasCallback && this.failRedirect && this.failURL) {
           window.location.href = this.failURL;
         }
       }
     })
     .catch(err => {
       console.error('GoogleSignInManager Error:', err);
-      if (this.failCallback && typeof this.failCallback === 'function') {
+      const hasCallback = this.failCallback && typeof this.failCallback === 'function';
+      if (hasCallback) {
         this.failCallback({ status: 'error', error: err });
       }
-      if (this.failRedirect && this.failURL) {
+      if (!hasCallback && this.failRedirect && this.failURL) {
         window.location.href = this.failURL;
       }
     });
