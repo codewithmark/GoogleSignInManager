@@ -3,7 +3,8 @@ class GoogleSignInManager {
     this.elementId = null;
     this.clientId = null;
     this.tokenURL = null;
-    this.failURL = null;
+  this.failURL = null;
+  this.failRedirect = true; // new flag to control failURL redirect
     this.successURL = null;
     this.failCallback = null;
     this.successCallback = null;
@@ -42,6 +43,11 @@ class GoogleSignInManager {
   FailURL(url, callback = null) {
     this.failURL = url;
     this.failCallback = callback;
+    return this;
+  }
+
+  FailRedirect(enabled) {
+    this.failRedirect = enabled;
     return this;
   }
 
@@ -183,7 +189,9 @@ class GoogleSignInManager {
         if (this.failCallback && typeof this.failCallback === 'function') {
           this.failCallback(data);
         }
-        window.location.href = this.failURL;
+        if (this.failRedirect && this.failURL) {
+          window.location.href = this.failURL;
+        }
       }
     })
     .catch(err => {
@@ -191,7 +199,9 @@ class GoogleSignInManager {
       if (this.failCallback && typeof this.failCallback === 'function') {
         this.failCallback({ status: 'error', error: err });
       }
-      window.location.href = this.failURL;
+      if (this.failRedirect && this.failURL) {
+        window.location.href = this.failURL;
+      }
     });
   }
 
